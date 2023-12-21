@@ -1,0 +1,18 @@
+{
+  "Lua.runtime.nonstandardSymbol": [
+    "+=", "-=", "*=", "/=", "//=", "%=", "<<=", ">>=", "&=", "|=", "^="
+  ],
+  "Lua.diagnostics.globals": [
+    "import",
+  ],
+  "Lua.diagnostics.severity": {
+    "duplicate-set-field": "Hint"
+  },
+  "Lua.format.defaultConfig": {
+    "indent_style": "space",
+    "indent_size": "4"
+  },
+  "Lua.workspace.library": [
+    "playdate-luacats"
+  ]
+}

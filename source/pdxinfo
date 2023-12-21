@@ -1,0 +1,7 @@
+name=Kolya vs Babushkas
+author=Wobbly Chair, Inc.
+description=Fun!
+bundleID=com.wobblychair.grannies
+version=1.0
+buildNumber=100
+imagePath=system-assets
