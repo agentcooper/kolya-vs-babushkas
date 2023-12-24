@@ -111,6 +111,22 @@ local function new_flower()
     end
 end
 
+function table.slice(tbl, first, last, step)
+    local sliced = {}
+    for i = first or 1, last or #tbl, step or 1 do
+        sliced[#sliced + 1] = tbl[i]
+    end
+    return sliced
+end
+
+local function isLookingLeft(direction)
+    return direction == DIRECTION.left or direction == DIRECTION.left_up or direction == DIRECTION.left_down
+end
+
+local function isLookingRight(direction)
+    return direction == DIRECTION.right or direction == DIRECTION.right_up or direction == DIRECTION.right_down
+end
+
 local function new_player()
     local sprite = gfx.sprite.new(image_player)
     sprite:setCenter(0.5, 1)
@@ -121,13 +137,31 @@ local function new_player()
     sprite:setCollidesWithGroups({ TAG.granny })
     sprite:setZIndex(1)
     sprite:setCollideRect(0, 0, sprite:getSize())
+
+    local trail = {}
+
     function sprite:update()
         self:setZIndex(math.floor(self.y))
-        if playerDirection == DIRECTION.left or playerDirection == DIRECTION.left_up or playerDirection == DIRECTION.left_down then
+
+        if isLookingLeft(playerDirection) then
             self:setImageFlip(gfx.kImageUnflipped)
-        end
-        if playerDirection == DIRECTION.right or playerDirection == DIRECTION.right_up or playerDirection == DIRECTION.right_down then
+        else
             self:setImageFlip(gfx.kImageFlippedX)
+        end
+
+        table.insert(trail, 1, { x = self.x, y = self.y })
+        trail = table.slice(trail, 1, 10, 1)
+    end
+
+    function sprite:overlay()
+        for i = 1, #trail, 1 do
+            if isLookingLeft(playerDirection) then
+                gfx.drawRect(trail[i].x + 55, trail[i].y - 5, 4, 2)
+                gfx.drawRect(trail[i].x - 65, trail[i].y - 5, 4, 2)
+            else
+                gfx.drawRect(trail[i].x + 60, trail[i].y - 5, 4, 2)
+                gfx.drawRect(trail[i].x - 60, trail[i].y - 5, 4, 2)
+            end
         end
     end
 
@@ -366,7 +400,7 @@ function playdate.AButtonDown()
     new_rocket()
 end
 
-local function getPlayerDirection()
+local function getPlayerDirection(current)
     if dx == -1 and dy == 0 then
         return DIRECTION.left
     end
@@ -374,9 +408,21 @@ local function getPlayerDirection()
         return DIRECTION.right
     end
     if dx == 0 and dy == 1 then
+        if isLookingLeft(current) then
+            return DIRECTION.left_down
+        end
+        if isLookingRight(current) then
+            return DIRECTION.right_down
+        end
         return DIRECTION.down
     end
     if dx == 0 and dy == -1 then
+        if isLookingLeft(current) then
+            return DIRECTION.left_up
+        end
+        if isLookingRight(current) then
+            return DIRECTION.right_up
+        end
         return DIRECTION.up
     end
     if dx == -1 and dy == -1 then
@@ -396,22 +442,22 @@ end
 
 function playdate.leftButtonDown()
     dx -= 1
-    playerDirection = getPlayerDirection()
+    playerDirection = getPlayerDirection(playerDirection)
 end
 
 function playdate.rightButtonDown()
     dx += 1
-    playerDirection = getPlayerDirection()
+    playerDirection = getPlayerDirection(playerDirection)
 end
 
 function playdate.upButtonDown()
     dy -= 1
-    playerDirection = getPlayerDirection()
+    playerDirection = getPlayerDirection(playerDirection)
 end
 
 function playdate.downButtonDown()
     dy += 1
-    playerDirection = getPlayerDirection()
+    playerDirection = getPlayerDirection(playerDirection)
 end
 
 function playdate.leftButtonUp()
@@ -469,5 +515,6 @@ function playdate.update()
     gfx.setDrawOffset(cameraX + screenOffsetX, cameraY + screenOffsetY)
 
     gfx.sprite.update()
+    player:overlay()
     -- playdate.drawFPS(0, 0)
 end
