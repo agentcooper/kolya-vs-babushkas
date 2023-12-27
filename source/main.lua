@@ -49,7 +49,7 @@ local images_granny <const> = {
 
 local image_flower = gfx.image.new("images/flower")
 local image_tree = gfx.image.new("images/tree")
-local image_player = gfx.image.new("images/player_2")
+local image_player = gfx.image.new("images/player")
 local image_rocket = gfx.image.new("images/rocket")
 
 local sounds_granny <const> = {
