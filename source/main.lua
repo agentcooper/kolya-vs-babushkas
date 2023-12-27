@@ -68,6 +68,11 @@ local sounds_fire <const> = {
     playdate.sound.sample.new("sounds/fire_3")
 }
 
+local sounds_player_hit <const> = {
+    playdate.sound.sample.new("sounds/player_hit_1"),
+    playdate.sound.sample.new("sounds/player_hit_2")
+}
+
 local sounds_game_over <const> = {
     playdate.sound.sample.new("sounds/game_over_1"),
     playdate.sound.sample.new("sounds/game_over_2"),
@@ -196,6 +201,7 @@ local function take_damage()
         return
     end
 
+    get_random_item(sounds_player_hit):play()
     health -= 1
 
     if health <= 0 then
