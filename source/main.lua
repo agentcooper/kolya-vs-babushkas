@@ -94,6 +94,15 @@ local cameraY = 0
 local screenOffsetX = 0
 local screenOffsetY = 0
 
+local rockets_left = 5
+local rocket_refill_timer = playdate.timer.new(1000, function()
+    if rockets_left >= 5 then
+        return
+    end
+    rockets_left += 1
+end)
+rocket_refill_timer.repeats = true
+
 local function new_tree()
     local sprite = gfx.sprite.new(image_tree)
     sprite:moveTo(math.random(-400, 400), math.random(-400, 400))
@@ -393,7 +402,7 @@ reset = function()
     end)
 
     state = STATE.playing
-    health = 1
+    health = 3
 
     dx = 0
     dy = 0
@@ -410,7 +419,11 @@ reset = function()
 end
 
 function playdate.AButtonDown()
+    if rockets_left <= 0 then
+        return
+    end
     new_rocket()
+    rockets_left -= 1
 end
 
 local function getPlayerDirection(current)
