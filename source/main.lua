@@ -16,7 +16,7 @@ local TAG <const> = {
 
 local STATE <const> = {
     playing = 1,
-    dead = 2
+    game_over = 2
 }
 
 local DIRECTION <const> = {
@@ -68,11 +68,18 @@ local sounds_fire <const> = {
     playdate.sound.sample.new("sounds/fire_3")
 }
 
+local sounds_game_over <const> = {
+    playdate.sound.sample.new("sounds/game_over_1"),
+    playdate.sound.sample.new("sounds/game_over_2"),
+    playdate.sound.sample.new("sounds/game_over_3")
+}
+
 local function get_random_item(table)
     return table[math.random(1, #table)]
 end
 
 local sampleplayer_granny = playdate.sound.sampleplayer.new(sounds_granny[1])
+local sampleplayer_end = playdate.sound.sampleplayer.new(sounds_game_over[1])
 
 local health = 3
 local state = STATE.playing
@@ -176,15 +183,21 @@ local player
 local reset
 
 local function take_damage()
-    if state == STATE.dead then
+    if state == STATE.game_over then
         return
     end
 
     health -= 1
 
     if health <= 0 then
-        state = STATE.dead
-        playdate.timer.performAfterDelay(2000, reset)
+        state = STATE.game_over
+
+        sampleplayer_granny:stop()
+        sampleplayer_end:setSample(get_random_item(sounds_game_over))
+        sampleplayer_end:setFinishCallback(function()
+            playdate.timer.performAfterDelay(2000, reset)
+        end)
+        sampleplayer_end:play()
     end
 end
 
@@ -242,7 +255,7 @@ local function new_granny(x, y)
     sprite:setZIndex(1)
 
     local function say_something()
-        if sprite == nil or sampleplayer_granny:isPlaying() then
+        if state == STATE.game_over or sprite == nil or sampleplayer_granny:isPlaying() then
             return
         end
 
@@ -250,7 +263,7 @@ local function new_granny(x, y)
         local onTheLeft = sprite.x < player.x
         local length = 0
         if volume > 0 then
-            local sample = sounds_granny[math.random(1, #sounds_granny)]
+            local sample = get_random_item(sounds_granny)
             sampleplayer_granny:setSample(sample)
             if onTheLeft then
                 sampleplayer_granny:playAt(0, volume, 0);
@@ -380,7 +393,7 @@ reset = function()
     end)
 
     state = STATE.playing
-    health = 3
+    health = 1
 
     dx = 0
     dy = 0
@@ -481,7 +494,7 @@ reset()
 function playdate.update()
     playdate.timer.updateTimers()
 
-    if state == STATE.dead then
+    if state == STATE.game_over then
         gfx.setDrawOffset(0, 0)
         gfx.setColor(gfx.kColorBlack)
         gfx.fillRect(0, 0, 400, 240)
