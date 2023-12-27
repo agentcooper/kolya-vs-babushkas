@@ -99,9 +99,9 @@ local cameraY = 0
 local screenOffsetX = 0
 local screenOffsetY = 0
 
-local rockets_left = 5
+local rockets_left = 7
 local rocket_refill_timer = playdate.timer.new(1000, function()
-    if rockets_left >= 5 then
+    if rockets_left >= 7 then
         return
     end
     rockets_left += 1
@@ -171,7 +171,7 @@ local function new_player()
         end
 
         table.insert(trail, 1, { x = self.x, y = self.y })
-        trail = table.slice(trail, 1, 10, 1)
+        trail = table.slice(trail, 1, rockets_left + 2, 1)
     end
 
     function sprite:overlay()
@@ -404,8 +404,16 @@ end
 
 reset = function()
     gfx.sprite.performOnAllSprites(function(sprite)
-        sprite:destroy()
+        if sprite.destroy ~= nil then
+            sprite:destroy()
+        end
     end)
+
+    gfx.sprite.setBackgroundDrawingCallback(
+        function(x, y, width, height)
+            gfx.drawCircleAtPoint(cameraX, cameraY, 600)
+        end
+    )
 
     state = STATE.playing
     health = 3
@@ -511,6 +519,7 @@ end
 reset()
 
 function playdate.update()
+    gfx.clear()
     playdate.timer.updateTimers()
 
     if state == STATE.game_over then
