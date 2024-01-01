@@ -4,7 +4,7 @@
 
 Small game I made for my friend Kolya. In the game Kolya is riding his sofa and fights against grannies (*babushkas*) by throwing Nintendo Switch controllers at them.
 
-My first attempt at programming for Playdate. The game art is made by Asya.
+My first attempt at programming for Playdate. The game art is made by Asya. The game design is inspired by [Buns: Bunny Survivor on PICO-8](https://unikotoast.itch.io/buns-bunny-survivor).
 
 ## How it looks?
 
